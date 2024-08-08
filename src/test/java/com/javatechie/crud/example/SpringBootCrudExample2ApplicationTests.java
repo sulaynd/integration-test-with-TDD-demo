@@ -50,6 +50,7 @@ class SpringBootCrudExample2ApplicationTests {
     @Test
     @Sql(statements = "INSERT INTO PRODUCT_TBL (id,name, quantity, price) VALUES (4,'AC', 1, 34000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(statements = "DELETE FROM PRODUCT_TBL WHERE name='AC'", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    //@Sql(statements = "DELETE FROM PRODUCT_TBL WHERE id=4", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void testGetProducts() {
         List<Product> products = restTemplate.getForObject(baseUrl, List.class);
         assertEquals(1, products.size());
@@ -71,7 +72,7 @@ class SpringBootCrudExample2ApplicationTests {
 
     @Test
     @Sql(statements = "INSERT INTO PRODUCT_TBL (id,name, quantity, price) VALUES (2,'shoes', 1, 999)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(statements = "DELETE FROM PRODUCT_TBL WHERE id=1", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(statements = "DELETE FROM PRODUCT_TBL WHERE id=2", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void testUpdateProduct(){
         Product product = new Product("shoes", 1, 1999);
         restTemplate.put(baseUrl+"/update/{id}", product, 2);
@@ -80,15 +81,12 @@ class SpringBootCrudExample2ApplicationTests {
                 () -> assertNotNull(productFromDB),
                 () -> assertEquals(1999, productFromDB.getPrice())
         );
-
-
-
     }
 
     @Test
     @Sql(statements = "INSERT INTO PRODUCT_TBL (id,name, quantity, price) VALUES (8,'books', 5, 1499)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testDeleteProduct(){
-        int recordCount=h2Repository.findAll().size();
+        int recordCount = h2Repository.findAll().size();
         assertEquals(1, recordCount);
         restTemplate.delete(baseUrl+"/delete/{id}", 8);
         assertEquals(0, h2Repository.findAll().size());
